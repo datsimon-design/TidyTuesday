@@ -5,3 +5,9 @@ Here I want to practice my R and data visualisation skills by picking some inter
 ## Structure
 
 The [first Project](/2024-10-15_SouthernResidents) exploring Orca sightings in around Vancouver
+
+
+├── 2024-10-15_SouthernResidents
+|     ├── 2024-10-15_SouthernResidents.qmd	<< Data analysis and visualisation script
+|     ├── orca_distribution.jpg			<< Visualisation output
+
