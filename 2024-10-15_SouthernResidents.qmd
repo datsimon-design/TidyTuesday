@@ -32,14 +32,14 @@ orcas_year <- orcas |>
 
 orca_season <- orcas_year |> 
   mutate(season = case_when(
-    month %in% 3:5   ~ "spring",
-    month %in% 6:8   ~ "summer",
-    month %in% 9:11  ~ "fall",
-    month %in% c(12, 1, 2) ~ "winter",
+    month %in% 3:5   ~ "Spring",
+    month %in% 6:8   ~ "Summer",
+    month %in% 9:11  ~ "Fall",
+    month %in% c(12, 1, 2) ~ "Winter",
     TRUE ~ NA_character_
   ))
 
-factor(orca_season$season, levels = c("spring", "summer", "fall", "winter"))
+factor(orca_season$season, levels = c("Spring", "Summer", "Fall", "Winter"))
 
 ```
 
@@ -94,6 +94,26 @@ loc_clean <- loc[!on_land, ]
 ```
 
 ```{r}
+season_counts <- loc_clean |>
+  st_drop_geometry() |>
+  count(season) |>
+  mutate(label = paste("Sightings:", n))
+
+season_counts
+```
+
+
+```{r}
+season_palette <- c(
+  "Spring" = "#78B77A",
+  "Summer" = "#E9B44C",
+  "Fall" = "#D47745",
+  "Winter" = "#5B83B4"
+)
+```
+
+
+```{r}
 
 
 
@@ -109,7 +129,15 @@ loc_clean |>
     size = 3.5
   ) +
   
-  geom_sf(aes(color = season)) +
+  geom_text(data = season_counts,
+    aes(x = -Inf, y = -Inf, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.1,
+    vjust = -1,
+    size = 3,
+    colour = "grey25",) +
+  
+  geom_sf(aes(color = season), size = 1) +
   
   coord_sf(
     xlim = st_bbox(loc_clean)[c("xmin", "xmax")],
@@ -117,15 +145,50 @@ loc_clean |>
   ) +
   
   labs(
-    title = "Southern Resident Orca seasonal distribution",
-    caption = "Test"
+    title = "Seasonal Distribution of Southern Resident Killer Whales",
+    subtitle = "Sightings around Vancouver Island, British Columbia from 2017 to 2024",
+    caption = "Data: https://www.whaleresearch.com/encounters | Analysis: Simon Gendrisch",
+    x = "",
+    y = ""
     )+
   
   facet_wrap(~season)+
   
-  theme_minimal()
+  
+  theme_minimal() +
+  
+  theme(
+    text = element_text(family = "Roboto", size = 12),
+    plot.title = element_text(
+      family = "Roboto",
+      size = 18,
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+        size = 10,
+        colour = "grey40"
+      ),
+    strip.text  = element_text(
+        size = 11,
+        face = "bold"
+      ),
+    axis.title = element_text(
+      family = "Roboto Light",
+      size = 12
+    ),
+    plot.caption = element_text(
+      family = "Roboto Light"
+    ),
+    
+    legend.position = "none"
+  ) +
+  
+  scale_colour_manual(values = season_palette)
 
 
+```
 
+```{r}
+ggsave("orca_distribution.jpg", plot = p, width = 297, height = 200, units = "mm", dpi = 300)
 ```
 
